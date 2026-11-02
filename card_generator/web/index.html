@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Карточки КИП - черновики описаний товаров</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand"><span class="brand-mark"></span>Карточки КИП</div>
+      <div class="model" id="model-info"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>Карточки товара на основе характеристик</h1>
+      <p>Загрузите JSON - сервис подготовит SEO-заголовок и описание, таблицу характеристик, поисковые запросы и подсказки для менеджера. Характеристики не выдумываются: всё сомнительное попадает в список «Требует уточнения».</p>
+    </section>
+
+    <section class="start">
+      <div id="dropzone" class="card dropzone" tabindex="0" role="button" aria-label="Загрузить JSON-файл">
+        <input type="file" id="file-input" accept=".json,application/json" hidden>
+        <div class="drop-plus">+</div>
+        <div class="drop-title">Перетащите JSON-файл сюда</div>
+        <div class="drop-hint">или нажмите, чтобы выбрать · только .json, до <span id="max-mb">50</span> МБ</div>
+      </div>
+
+      <div class="card examples">
+        <div class="card-title">Или попробуйте пример</div>
+        <div id="examples-list" class="examples-list"></div>
+        <details class="format">
+          <summary>Формат входного файла</summary>
+          <pre>{
+  "name": "Манометр показывающий DM 02",
+  "manufacturer": "Манотомь",
+  "specs": {
+    "диапазон измерений": "0–1,6 МПа",
+    "класс точности": "1,5"
+  },
+  "description": "Прибор предназначен для..."
+}</pre>
+          <p>Можно передать один товар или список товаров (до <span id="max-products">10</span> за раз).</p>
+        </details>
+      </div>
+    </section>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <section id="parse" class="card parse" hidden>
+      <div class="card-head">
+        <div class="card-title">Результат разбора</div>
+        <div id="parse-summary" class="muted"></div>
+      </div>
+      <div id="product-tabs" class="tabs"></div>
+    </section>
+
+    <section id="result" hidden>
+      <div id="result-head" class="card result-head"></div>
+
+      <div id="result-loading" class="card loading" hidden>
+        <div class="spinner"></div>
+        <div>
+          <div>Модель готовит карточку…</div>
+          <div class="muted">обычно 10–60 секунд, с проверкой и исправлением ответа</div>
+        </div>
+      </div>
+
+      <div id="result-error" class="card error-card" hidden></div>
+
+      <div id="result-body" class="grid" hidden>
+        <div class="col">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">SEO-заголовок</div>
+              <span id="title-counter" class="counter"></span>
+              <button class="ghost" data-copy="seo-title">Копировать</button>
+            </div>
+            <p id="seo-title" class="seo-title"></p>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">SEO-описание</div>
+              <span id="description-counter" class="counter"></span>
+              <button class="ghost" data-copy="seo-description">Копировать</button>
+            </div>
+            <div id="seo-description" class="seo-description"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Поисковые запросы</div>
+              <button class="ghost" data-copy="queries">Копировать</button>
+            </div>
+            <div id="queries" class="chips"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Скачать</div>
+            <div class="downloads">
+              <button class="primary" data-download="json">JSON</button>
+              <button class="primary" data-download="md">Markdown</button>
+              <button class="secondary" data-download="all" id="download-all" hidden>Все товары · JSON</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Ключевые характеристики</div>
+              <div class="legend">
+                <span class="source source-specs">из характеристик</span>
+                <span class="source source-description">из описания</span>
+                <span class="source source-none">нет данных</span>
+              </div>
+            </div>
+            <table class="specs"><tbody id="specs"></tbody></table>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Для менеджера</div>
+            <div class="manager">
+              <div>
+                <h4>Кому подходит</h4>
+                <ul id="suitable"></ul>
+              </div>
+              <div>
+                <h4>Какие задачи решает</h4>
+                <ul id="solves"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="card review-card">
+            <div class="card-title">Требует уточнения</div>
+            <ul id="review" class="review"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">Черновик для контент-менеджера</footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
