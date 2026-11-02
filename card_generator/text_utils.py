@@ -16,7 +16,6 @@ NON_WORD_PATTERN = re.compile(r"[^\w\s]")
 SPACES_PATTERN = re.compile(r"\s+")
 UNIT_IN_KEY_PATTERN = re.compile(r"\(([^()]{1,15})\)$|,\s*([^,]{1,15})$")
 GENERIC_STEMS = {"рабоч", "измер", "изм", "налич", "тип", "значе"}
-VALUE_WITH_UNIT_PATTERN = re.compile(r"(\d+(?:[.,]\d+)?)\s*([^\s\d.,;:()]+)")
 
 
 def normalize_text(text: str) -> str:
@@ -85,21 +84,6 @@ def extract_numbers(text: str) -> set[str]:
         Множество нормализованных чисел.
     """
     return {normalize_number(match) for match in NUMBER_PATTERN.findall(text)}
-
-
-def value_with_unit_pairs(text: str) -> set[str]:
-    """Находит в тексте пары «число единица», например «160 кгс/см²».
-
-    Args:
-        text: Значение характеристики или текст карточки.
-
-    Returns:
-        Множество пар в едином виде: число нормализовано, единица в нижнем регистре.
-    """
-    return {
-        f"{normalize_number(number)} {unit}"
-        for number, unit in VALUE_WITH_UNIT_PATTERN.findall(normalize_text(text))
-    }
 
 
 def word_stems(text: str, stem_length: int = 5) -> set[str]:

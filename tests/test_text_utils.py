@@ -10,7 +10,6 @@ from card_generator.text_utils import (
     normalize_text,
     slugify,
     strip_unit,
-    value_with_unit_pairs,
 )
 
 
@@ -79,18 +78,3 @@ def test_is_similar_key(first: str, second: str, expected: bool) -> None:
 def test_strip_unit(raw: str, expected: str) -> None:
     """Единица измерения убирается из конца названия."""
     assert strip_unit(raw) == expected
-
-
-@pytest.mark.parametrize(
-    ("text", "expected"),
-    [
-        ("со 160 кгс/см²", {"160 кгс/см²"}),
-        ("от 100 кгс/см² до 160 кгс/см²", {"100 кгс/см²", "160 кгс/см²"}),
-        ("Диаметр 160 мм, класс 1,5", {"160 мм"}),
-        ("1,50 МПа и 1.5 мпа", {"1.5 мпа"}),
-        ("IP40; класс 1,5 (по заказу 1,0)", set()),
-    ],
-)
-def test_value_with_unit_pairs(text: str, expected: set[str]) -> None:
-    """Пары «число единица» находятся в едином виде, числа без единиц пропускаются."""
-    assert value_with_unit_pairs(text) == expected

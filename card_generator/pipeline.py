@@ -113,13 +113,7 @@ class CardGenerator:
             split = split_specs(product, schema)
         rows = build_key_specs(schema, split, report.verified_specs)
         missing = find_missing(schema, rows)
-        card_texts = {
-            "SEO-заголовок": draft.seo_title,
-            "SEO-описание": draft.seo_description,
-            "поисковые запросы": " ".join(draft.search_queries),
-            "блок для менеджера": " ".join(draft.manager_note.suitable_for + draft.manager_note.solves),
-        }
-        clarifications += critical_from_description(schema, split, report.verified_specs, card_texts)
+        clarifications += critical_from_description(schema, split, report.verified_specs)
         clarifications += draft.clarifications
         needs_review = bool(report.problems or clarifications or any(item.critical for item in missing))
         quality = QualityReport(

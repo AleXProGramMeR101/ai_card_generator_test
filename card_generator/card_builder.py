@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from card_generator.models import NO_DATA, ExtractedSpec, MissingField, ProductInput, SpecRow
 from card_generator.schema_registry import CategorySchema
-from card_generator.text_utils import UNIT_IN_KEY_PATTERN, value_with_unit_pairs
+from card_generator.text_utils import UNIT_IN_KEY_PATTERN
 
 NUMERIC_VALUE_PATTERN = re.compile(r"^[\d\s.,;…\-–х*x]+$")
 
@@ -110,40 +110,17 @@ def build_key_specs(
     return rows
 
 
-def find_value_usage(value: str, card_texts: dict[str, str]) -> list[str]:
-    """Ищет, в каких текстах карточки использовано значение с единицей измерения.
-
-    Значения без единицы (например, «1,5») не ищутся: одно число слишком часто совпадает случайно.
-
-    Args:
-        value: Значение характеристики, например «со 160 кгс/см²».
-        card_texts: Тексты карточки: название блока → текст.
-
-    Returns:
-        Названия блоков, в которых встречается значение.
-    """
-    pairs = value_with_unit_pairs(value)
-    if not pairs:
-        return []
-    return [label for label, text in card_texts.items() if pairs & value_with_unit_pairs(text)]
-
-
 def critical_from_description(
     schema: CategorySchema | None,
     split: SpecsSplit,
     extracted: list[ExtractedSpec],
-    card_texts: dict[str, str] | None = None,
 ) -> list[str]:
     """Отмечает важные характеристики, значение которых взято из описания, а не из характеристик.
-
-    Если такое значение попало в тексты карточки, отдельно указывается, где именно: при ошибке модели
-    исправлять придётся не только таблицу.
 
     Args:
         schema: Схема категории или None.
         split: Характеристики из входного JSON.
         extracted: Подтверждённые характеристики из описания.
-        card_texts: Тексты карточки: название блока → текст.
 
     Returns:
         Пункты для раздела «Требует уточнения».
@@ -154,17 +131,10 @@ def critical_from_description(
     for spec in extracted:
         schema_field = schema.find_field(spec.name)
         if schema_field and schema_field.critical and schema_field.name not in split.matched:
-            name = capitalize(schema_field.name)
             notes.append(
-                f"Важная характеристика «{name}: {spec.value}» взята из описания, "
+                f"Важная характеристика «{capitalize(schema_field.name)}: {spec.value}» взята из описания, "
                 f"а не из характеристик (цитата: «{spec.quote}») - проверьте, что это именно она"
             )
-            usage = find_value_usage(spec.value, card_texts or {})
-            if usage:
-                notes.append(
-                    f"Значение «{spec.value}» характеристики «{name}» использовано в текстах карточки "
-                    f"({', '.join(usage)}) - если оно неверно, исправьте и их"
-                )
     return notes
 
 

@@ -228,34 +228,3 @@ def test_long_description_trimmed_without_retry(make_generator, mp4u: ProductInp
     assert len(llm.calls) == 1
     assert 800 <= result.card.seo_description_length <= 1200
     assert result.quality.warnings == []
-
-
-def test_critical_value_from_description_used_in_texts(make_generator) -> None:
-    """Если значение важной характеристики из описания попало в тексты, указано, куда именно."""
-    product = ProductInput(
-        name="Манометр МП4-У",
-        specs={"класс точности": "1,5", "резьба": "M20x1,5", "диаметр корпуса": "160 мм"},
-        description="С демпфером поставляется прибор с диапазоном показаний со 100 кгс/см², IP40, IP53, IP54, У2, Т2.",
-    )
-    extracted = [{"name": "диапазон измерений", "value": "со 100 кгс/см²", "quote": "с диапазоном показаний со 100 кгс/см²"}]
-    queries = ["манометр МП4-У", "манометр МП4-У купить", "манометр МП4-У диапазон 100 кгс/см²"]
-    generator, _ = make_generator([to_json(make_draft(extracted_specs=extracted, search_queries=queries))])
-    notes = generator.generate(product).quality.needs_clarification
-    usage = [note for note in notes if note.startswith("Значение «со 100 кгс/см²»")]
-    assert usage == [
-        "Значение «со 100 кгс/см²» характеристики «Диапазон измерений» использовано в текстах карточки "
-        "(поисковые запросы) - если оно неверно, исправьте и их"
-    ]
-
-
-def test_value_usage_ignores_other_units(make_generator) -> None:
-    """Совпадение числа с другой единицей (160 мм и 160 кгс/см²) не считается использованием."""
-    product = ProductInput(
-        name="Манометр МП4-У",
-        specs={"класс точности": "1,5", "резьба": "M20x1,5", "диаметр корпуса": "160 мм"},
-        description="С демпфером поставляются приборы с диапазоном показаний со 160 кгс/см², IP40, IP53, IP54, У2, Т2.",
-    )
-    extracted = [{"name": "диапазон измерений", "value": "со 160 кгс/см²", "quote": "с диапазоном показаний со 160 кгс/см²"}]
-    generator, _ = make_generator([to_json(make_draft(extracted_specs=extracted))])
-    notes = generator.generate(product).quality.needs_clarification
-    assert not any(note.startswith("Значение «") for note in notes)
