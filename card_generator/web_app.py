@@ -67,9 +67,9 @@ class ServiceInfo(BaseModel):
 
 
 EXAMPLES = [
-    ExampleInfo(id="from_tz", title="Пример из ТЗ", note="DM 02: минимум данных, описание оборвано", file="dm-02.json"),
-    ExampleInfo(id="bad", title="МП4-У с сайта", note="данных много, но они грязные и противоречивые", file="mp4-u.json"),
-    ExampleInfo(id="good", title="МП3-У, полные данные", note="данные с сайта, приведённые в порядок", file="mp3-u.json"),
+    ExampleInfo(id="from_tz", title="Пример из ТЗ", note="DM 02: минимум данных", file="dm-02.json"),
+    ExampleInfo(id="bad", title="МП4-У с сайта", note="данных уже больше", file="mp4-u.json"),
+    ExampleInfo(id="good", title="МП3-У, полные данные", note="данные с сайта, с дополнением", file="mp3-u.json"),
 ]
 
 
