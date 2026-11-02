@@ -1,7 +1,7 @@
 [project]
 name = "card-generator"
 version = "0.1.0"
-description = "Автогенерация каточек товара"
+description = "Автогенерация карточек товара"
 requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
