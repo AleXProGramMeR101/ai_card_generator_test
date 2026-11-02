@@ -5,7 +5,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 logs/
-output/
 schemas/suggested/
 .idea/
 .vscode/
